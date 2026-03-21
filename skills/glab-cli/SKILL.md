@@ -5,97 +5,101 @@ description: Manage GitLab issues, merge requests, CI/CD pipelines, and reposito
 
 ### GitLab CLI (glab) Skill Guidelines
 
-This guide provides instructions and examples for using the `glab` CLI to manage GitLab resources. The `glab` binary is located at `glab`.
+This guide provides instructions and examples for using the `glab` CLI to manage GitLab resources efficiently. The `glab` binary is typically available in the system PATH.
 
-#### 1. General Usage
-Always use the full path to the binary or ensure it is in your `PATH`.
+#### 1. General Usage and Global Flags
+All `glab` commands can be used with global flags to specify the target repository or host.
+- `-R, --repo <OWNER/REPO>`: Select another repository using the `OWNER/REPO` or `GROUP/NAMESPACE/REPO` format or the project ID.
+- `-h, --help`: Display help for a command.
+
+Example:
 ```bash
-/home/dev/bin/glab <command> <subcommand> [flags]
+glab repo view -R owner/project
 ```
 
 #### 2. Authentication
-If not already authenticated, use:
-```bash
-glab auth login
-```
-To check status:
-```bash
-glab auth status
-```
+Check your login status or specify a GitLab instance.
+- **Check status:**
+  ```bash
+  glab auth status
+  ```
+- **Login to a specific instance:**
+  ```bash
+  glab auth login --hostname gitlab.example.com
+  ```
 
 #### 3. Managing Issues
+When creating issues in non-interactive environments (like scripts or CI), both `--title` and `--description` are required.
 - **List issues:**
   ```bash
-  glab issue list --repo <group/project>
+  glab issue list -R owner/project
   ```
 - **View an issue:**
   ```bash
-  glab issue view <id>
+  glab issue view <id> -R owner/project
   ```
-- **Create an issue:**
+- **Create an issue (Non-interactive):**
   ```bash
-  glab issue create --title "Issue Title" --description "Issue Description"
+  glab issue create -R owner/project --title "Issue Title" --description "Detailed Description" --label emergency
   ```
 - **Close an issue:**
   ```bash
-  glab issue close <id>
+  glab issue close <id> -R owner/project
   ```
 
 #### 4. Managing Merge Requests (MRs)
 - **List MRs:**
   ```bash
-  glab mr list
+  glab mr list -R owner/project
+  ```
+- **View MR details and status:**
+  ```bash
+  glab mr view <id> -R owner/project
   ```
 - **Create an MR:**
   ```bash
-  glab mr create --fill --label bugfix
+  glab mr create --fill --label bugfix -R owner/project
   ```
 - **View MR diff:**
   ```bash
-  glab mr diff <id>
+  glab mr diff <id> -R owner/project
   ```
 - **Merge an MR:**
   ```bash
-  glab mr merge <id>
+  glab mr merge <id> -R owner/project
   ```
 
 #### 5. CI/CD Pipelines and Jobs
 - **List pipelines:**
   ```bash
-  glab ci list
+  glab ci list -R owner/project
   ```
 - **View pipeline status:**
   ```bash
-  glab ci status
+  glab ci status -R owner/project
   ```
 - **Trace a job log:**
   ```bash
-  glab ci trace <job-id>
-  ```
-- **Run a manual job:**
-  ```bash
-  glab ci trigger <job-id>
+  glab ci trace <job-id> -R owner/project
   ```
 
 #### 6. Repository Operations
-- **Clone a repository:**
-  ```bash
-  glab repo clone <group/project>
-  ```
 - **Search for projects:**
+  Use the `-s` flag to search by name or description.
   ```bash
-  glab repo search <keyword>
+  glab repo search -s "project"
   ```
 - **View project details:**
   ```bash
-  glab repo view <group/project>
+  glab repo view owner/project
+  ```
+- **Clone a repository:**
+  ```bash
+  glab repo clone owner/project
   ```
 
-#### 7. Tips
-- Use `-R` or `--repo` to specify the repository if you are not inside a git repository or want to target another one.
-  - Format: `group/project` or `https://gitlab.com/group/project`.
-- **Handling multiple GitLab instances:**
-  - If you are authenticated to multiple GitLab instances, `glab` might default to `gitlab.com`.
-  - To specify a host for a command, use a full URL in the `--repo` flag, e.g., `glab repo view https://gitlab.example.com/owner/repo`.
-- Use `--help` after any command or subcommand to see available flags and examples.
-- Many commands support `--web` to open the resource in your browser.
+#### 7. Practical Tips for Automation
+- **Piping outputs:** Use standard Unix tools like `grep`, `awk`, or `jq` (if JSON output is supported via `--format json`) to parse outputs.
+- **Specifying project IDs:** You can use the numeric project ID in place of the `OWNER/REPO` string for most commands.
+- **Handling multiple hosts:** If you work with multiple GitLab instances, always use the full repository URL or specify the host via `GLAB_HOST` environment variable if needed.
+- **Interactive vs. Non-interactive:** Always provide all required flags (like title and description for issue creation) to avoid interactive prompts that will fail in an automated environment.

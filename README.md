@@ -4,6 +4,8 @@
 
 ### Project Structure
 
+The subagents and skills in this repository are partially inspired by, or adapted from, the [superpowers](https://github.com/obra/superpowers) repository.
+
 - `agents/`: Contains configuration files for specialized subagents. These agents can be delegated specific tasks like code review or commit message generation.
 - `skills/`: Contains modular skills that extend Junie's functionality with domain-specific guidance, scripts, and best practices.
 - `install`: A bash script to link the agents and skills to Junie's configuration directory.
