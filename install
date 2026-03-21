@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Default target directory
+TARGET_DIR="${1:-$HOME/.junie}"
+
+# Ensure target directory exists
+mkdir -p "$TARGET_DIR"
+
+# Get the absolute path of the current directory (repository root)
+REPO_ROOT=$(pwd)
+
+# Function to create symlink
+create_symlink() {
+    local source_dir="$1"
+    local target_dir="$2"
+    local dir_name=$(basename "$source_dir")
+    local link_path="$target_dir/$dir_name"
+
+    # Remove existing file, directory or symlink if it exists
+    if [ -e "$link_path" ] || [ -L "$link_path" ]; then
+        rm -rf "$link_path"
+    fi
+
+    ln -s "$source_dir" "$link_path"
+    echo "Symlinked $source_dir to $link_path"
+}
+
+# Symlink agents and skills
+create_symlink "$REPO_ROOT/agents" "$TARGET_DIR"
+create_symlink "$REPO_ROOT/skills" "$TARGET_DIR"
+
+echo "Installation complete. Directories linked to $TARGET_DIR"
