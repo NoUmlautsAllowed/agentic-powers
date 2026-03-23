@@ -1,16 +1,16 @@
-# Plan Document Reviewer Prompt Template
+# Plan Reviewer Prompt Template
 
-Use this template when dispatching a plan document reviewer subagent.
+Use this template when dispatching a plan-reviewer subagent.
 
-**Purpose:** Verify the plan is complete, matches the spec, and has proper task decomposition.
+**Purpose:** Verify the plan is complete, matches the spec, and aligns with the target architecture.
 
-**Dispatch after:** The complete plan is written.
+Dispatch after: The complete plan is written.
 
 ```
-Task tool (general-purpose):
-  description: "Review plan document"
-  prompt: |
-    You are a plan document reviewer. Verify this plan is complete and ready for implementation.
+Agent tool:
+  agent: "plan-reviewer"
+  task: |
+    Review this plan document for completeness, spec alignment, and architectural integrity.
 
     **Plan to review:** [PLAN_FILE_PATH]
     **Spec for reference:** [SPEC_FILE_PATH]
@@ -19,31 +19,20 @@ Task tool (general-purpose):
 
     | Category | What to Look For |
     |----------|------------------|
-    | Completeness | TODOs, placeholders, incomplete tasks, missing steps |
-    | Spec Alignment | Plan covers spec requirements, no major scope creep |
-    | Task Decomposition | Tasks have clear boundaries, steps are actionable |
-    | Buildability | Could an engineer follow this plan without getting stuck? |
+    | Spec Alignment | Plan covers all requirements from the spec, no scope creep |
+    | Architecture | Plan follows the target architecture and design patterns in spec |
+    | Completeness | No TODOs, placeholders, or missing critical implementation steps |
+    | Task Decomposition | Tasks are bite-sized, test-driven (TDD), and actionable |
+    | File Structure | Organization matches the architectural intent |
 
     ## Calibration
 
-    **Only flag issues that would cause real problems during implementation.**
-    An implementer building the wrong thing or getting stuck is an issue.
-    Minor wording, stylistic preferences, and "nice to have" suggestions are not.
+    **Only flag issues that would cause real problems during implementation or architectural drift.**
+    An implementer building the wrong thing, ignoring the architecture, or getting stuck is an issue.
+    Minor wording or "nice to have" stylistic suggestions are not.
 
-    Approve unless there are serious gaps — missing requirements from the spec,
+    Approve unless there are serious gaps — missing requirements, architectural violations,
     contradictory steps, placeholder content, or tasks so vague they can't be acted on.
-
-    ## Output Format
-
-    ## Plan Review
-
-    **Status:** Approved | Issues Found
-
-    **Issues (if any):**
-    - [Task X, Step Y]: [specific issue] - [why it matters for implementation]
-
-    **Recommendations (advisory, do not block approval):**
-    - [suggestions for improvement]
 ```
 
 **Reviewer returns:** Status, Issues (if any), Recommendations

@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Use when implementing features or bugfixes that require multiple steps, before starting code modifications.
 ---
 
 # Writing Plans
@@ -17,6 +17,24 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
+
+<HARD-GATE>
+Do NOT start implementation or invoke any implementation skill (e.g., subagent-driven-development, executing-plans) until:
+1. The plan is saved to a file.
+2. The Plan Review Loop with a subagent is complete.
+3. The user has reviewed the plan file and explicitly approved proceeding to implementation.
+</HARD-GATE>
+
+## Checklist
+
+You MUST complete these items in order:
+
+1. **Map File Structure** — Identify files to be created or modified.
+2. **Decompose Tasks** — Break the work into bite-sized, test-driven steps.
+3. **Write Plan to File** — Save the complete plan to the designated Markdown file.
+4. **Plan Review Loop** — Dispatch a subagent to review the plan file.
+5. **User Review Gate** — Ask the user to review the plan file and approve implementation.
+6. **Execution Handoff** — Offer execution options once approved.
 
 ## Scope Check
 
@@ -103,30 +121,57 @@ git commit -m "feat: add specific feature"
 ```
 ````
 
+## Common Mistakes
+
+- **Starting implementation too early** — Implementing before the plan is saved to a file, reviewed, and approved by the user.
+- **Vague tasks** — Not specifying exact file paths or code changes.
+- **Lack of testing steps** — Omitting the RED (test-first) and GREEN (minimal code) steps for each task.
+- **Narrative over structure** — Including your session history or thought process in the plan instead of just technical implementation details.
+
+## Rationalization Table
+
+| Excuse | Reality |
+|--------|---------|
+| "The plan is simple enough for the chat output." | Chat history is truncated. Files persist. Implementation without a saved plan file violates the <HARD-GATE>. |
+| "I'll save the plan after I finish the first task." | This creates a gap in the implementation history and violates the requirement for user approval. |
+| "A subagent review is overkill for this feature." | Subagents identify gaps and edge cases that are often overlooked. All plans MUST be reviewed. |
+| "The user already approved the design doc, so I can skip the plan review." | A design doc is NOT an implementation plan. The specific file-level steps must be reviewed and approved. |
+
+## Red Flags - STOP and Save Plan
+
+- You are about to use `search_replace` or `multi_edit` on source code without a saved plan file.
+- You are invoking `subagent-driven-development` or `executing-plans` before the user has said "approved" or "proceed" to the written plan.
+- The plan file is missing exact file paths or command lines.
+
+**All of these mean: STOP. Write the plan to a file, complete the review loop, and get user approval.**
+
 ## Remember
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
-- Reference relevant skills with @ syntax
+- Use `superpowers:subagent-driven-development` (or `superpowers:executing-plans`) for execution.
 - DRY, YAGNI, TDD, frequent commits
 
 ## Plan Review Loop
 
-After writing the complete plan:
+After saving the plan file:
 
-1. Dispatch a single plan-document-reviewer subagent (see plan-document-reviewer-prompt.md) with precisely crafted review context — never your session history. This keeps the reviewer focused on the plan, not your thought process.
+1. Dispatch a single plan-reviewer subagent (see agents/plan-reviewer.md) with precisely crafted review context — never your session history. This keeps the reviewer focused on the plan, not your thought process.
    - Provide: path to the plan document, path to spec document
-2. If ❌ Issues Found: fix the issues, re-dispatch reviewer for the whole plan
-3. If ✅ Approved: proceed to execution handoff
+2. If ❌ Issues Found: fix the issues in the file, re-dispatch reviewer for the whole plan
+3. If ✅ Approved: proceed to User Review Gate
 
-**Review loop guidance:**
-- Same agent that wrote the plan fixes it (preserves context)
-- If loop exceeds 3 iterations, surface to human for guidance
-- Reviewers are advisory — explain disagreements if you believe feedback is incorrect
+## User Review Gate
+
+After the subagent review passes, ask the user to review the written plan before proceeding:
+
+> "Plan written and saved to `<path>`. Please review it and let me know if you want to make any changes before we start implementation."
+
+Wait for the user's response. If they request changes, make them in the file and re-run the plan review loop. Only proceed to Execution Handoff once the user approves.
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After the user approves the plan, offer execution choice:
 
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
 
