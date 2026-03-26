@@ -39,9 +39,15 @@ Execute the implementation plan systematically. If using subagents, dispatch the
 
 ### 5. Push and Create Merge Request
 Once implementation is complete, tests pass, and your branch is updated, push and open a Merge Request.
+**The MR description MUST be in Markdown format.**
+
 ```bash
 git push -u origin feat/[feature-name]
-glab mr create --title "Implement [Feature Name]" --description "Summary of changes in markdown... Closes #[Issue Number]"
+glab mr create --title "Implement [Feature Name]" --description "### Summary of changes
+- [Brief list of changes]
+
+Closes #[Issue Number]
+"
 ```
 
 ## Common Mistakes
@@ -53,9 +59,11 @@ glab mr create --title "Implement [Feature Name]" --description "Summary of chan
 | Pushing without running tests | Ensure all changes compile and pass tests before pushing. |
 | Creating an MR with conflicts | Rebase or merge `main` into your feature branch before creating the MR. |
 | Leaving merged branches in local | Run `git branch -d <branch>` after the MR is merged. |
+| Non-Markdown MR description | Always use Markdown (headers, bullets) for MR descriptions. |
 
 ## Red Flags - STOP and Correct
 - Creating a feature branch without pulling `main` first.
 - Implementing a complex plan without decomposing it into test-driven steps.
 - Creating an MR without a descriptive summary or issue link.
+- **Creating an MR with a description that is not in Markdown format.**
 - Ignoring CI/CD pipeline failures after pushing.
