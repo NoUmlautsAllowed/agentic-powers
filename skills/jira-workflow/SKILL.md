@@ -66,13 +66,24 @@ Execute the implementation plan following Test-Driven Development (TDD).
 
 ### 7. Push and Create Merge Request
 When implementation is complete and tests pass, push the branch and open a Merge Request.
+**The MR description MUST be in Markdown format.**
+
 **MR Title Template:** `<JIRA TICKET ID>: [feature name]`
-**MR Description Template:** `Summary of the changes in Markdown format... Closes <JIRA TICKET ID>`
+**MR Description Template:** 
+```markdown
+### Summary of changes
+- [Brief list of changes]
+
+Closes <JIRA TICKET ID>
+```
 **Note: GitLab fully supports Markdown for MR descriptions.**
 
 ```bash
 git push -u origin ISSUE-XXXX
-glab mr create --title "ISSUE-XXXX: [feature name]" --description "Summary of the changes in Markdown format... Closes ISSUE-XXXX"
+glab mr create --title "ISSUE-XXXX: [feature name]" --description "### Summary of changes
+- [Brief list of changes]
+
+Closes ISSUE-XXXX"
 ```
 
 ### 9. Add MR Link as Jira Comment
@@ -92,6 +103,7 @@ acli jira workitem comment create --key ISSUE-XXXX --body "GitLab Merge Request:
 | Creating a GitLab issue | Skip GitLab issue creation; use Jira comments for the plan. |
 | Missing MR link in Jira | Ensure the GitLab MR link is added as a comment to the Jira Issue. |
 | Incorrect MR title | Follow the `<JIRA TICKET ID>: [feature name]` format exactly. |
+| Non-Markdown MR description | Always use Markdown (headers, bullets) for MR descriptions. |
 | Incorrect MR description | Ensure it starts with a summary and ends with `Closes <JIRA TICKET ID>`. |
 | Forgetting to pull main | Always run `git checkout main && git pull` before branching. |
 
@@ -99,6 +111,7 @@ acli jira workitem comment create --key ISSUE-XXXX --body "GitLab Merge Request:
 - **Failing to use Atlassian CLI `acli` for Jira operations.**
 - **Creating any ticket or issue (Jira or GitLab).**
 - Submitting an MR without the mandatory title prefix.
+- **Creating an MR with a description that is not in Markdown format.**
 - Forgetting to add the MR link as a Jira comment.
 - Putting the implementation plan in a GitLab issue instead of a Jira comment.
 - Implementing code before getting a Jira Ticket ID.
