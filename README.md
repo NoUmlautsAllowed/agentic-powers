@@ -1,16 +1,21 @@
-### Agentic Powers
+<div align="center">
+  <h1>✨ Agentic Powers</h1>
+  <p><strong>A collection of custom agents and skills for coding agents.</strong></p>
+</div>
 
-`agentic-powers` is a collection of custom agents and skills for Junie, an autonomous programmer developed by JetBrains. This repository provides modular capabilities and specialized subagents to enhance the development workflow.
+---
 
-### Project Structure
+`agentic-powers` provides modular capabilities, specialized subagents, and domain-specific guidance to significantly enhance your AI-assisted development workflow with coding agents like Claude or Junie.
 
-The subagents and skills in this repository are partially inspired by, or adapted from, the [superpowers](https://github.com/obra/superpowers) repository.
+> 🙌 **Huge Shoutout:** A massive thanks to the amazing [obra/superpowers](https://github.com/obra/superpowers) repository! The subagents and skills in this project are heavily inspired by and adapted from their fantastic work.
 
-- `agents/`: Contains configuration files for specialized subagents. These agents can be delegated specific tasks like code review or commit message generation.
-- `skills/`: Contains modular skills that extend Junie's functionality with domain-specific guidance, scripts, and best practices.
-- `install`: A bash script to link the agents and skills to Junie's configuration directory.
+## 📁 Project Structure
 
-### Installation
+- 🤖 **`agents/`**: Configuration files for specialized subagents. These agents can be delegated specific tasks like code review or commit message generation.
+- 🛠️ **`skills/`**: Modular skills that extend an agent's functionality with domain-specific guidance, scripts, and best practices.
+- ⚙️ **`install`**: A bash script to link the agents and skills to the configuration directory (defaults to Junie).
+
+## 🚀 Installation
 
 To install the agents and skills, run the provided `install` script from the project root. By default, it will symlink the directories to `~/.junie`.
 
@@ -21,23 +26,41 @@ To install the agents and skills, run the provided `install` script from the pro
 - **Default Target:** `~/.junie`
 - **Arguments:** You can optionally provide a custom target directory.
 
-### Agents
+## 🤖 Agents
 
 Agents are defined in Markdown files with YAML frontmatter. They provide instructions and personas for specialized tasks.
 
-- **`code-reviewer`**: A senior code reviewer agent that analyzes completed project steps against plans and coding standards.
-- **`commit-assistant`**: (Managed by the repository) Helps in creating informative git commit messages.
+| Agent | Description |
+|-------|-------------|
+| 🕵️‍♂️ **`code-reviewer`** | Use this agent when a major project step has been completed and needs to be reviewed against the original plan and coding standards. |
+| 📝 **`commit-assistant`** | Autonomously view and summarize changes to create a git commit with a great message. |
+| 🛠️ **`implementer`** | Executes a well-defined implementation task. |
+| 🧐 **`plan-reviewer`** | Reviews an implementation plan for completeness, spec alignment, and target architecture. |
 
-### Skills
+## 🛠️ Skills
 
 Each skill is located in its own directory within `skills/` and includes a `SKILL.md` file describing its usage.
 
-- **`glab-cli`**: Manage GitLab resources using the `glab` CLI.
-- **`brainstorming`**: Guidance for exploring intent and requirements before implementation.
-- **`writing-plans`**: Best practices for creating multi-step implementation plans.
-- **`writing-skills`**: Instructions and templates for creating and verifying new skills.
-- **`create-skill`**: Standardized workflow for adding new capabilities to this repository.
+| Skill | Description |
+|-------|-------------|
+| 🎫 **`atlassian-cli`** | Work seamlessly with Atlassian products (Jira, Confluence) from the command line using the `acli` tool. |
+| 🧠 **`brainstorming`** | You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation. |
+| 📝 **`git-commit`** | Use when creating git commit messages to ensure they follow project standards and best practices. |
+| 🦊 **`gitlab-workflow`** | Use when starting a new feature implementation, executing an implementation plan, or managing a GitLab issue and merge request lifecycle |
+| 🦊 **`glab-cli`** | Manage GitLab issues, merge requests, CI/CD pipelines, and repositories using the GitLab CLI (glab). |
+| 🎫 **`jira-workflow`** | Use when implementing features or bugfixes tracked in Jira, before starting code modifications, and when managing the GitLab Merge Request lifecycle. |
+| 🤖 **`subagent-driven-development`** | Use when executing implementation plans with independent tasks in the current session |
+| 🌳 **`using-git-worktrees`** | Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification |
+| 📋 **`writing-plans`** | Use when implementing features or bugfixes that require multiple steps, before starting code modifications. |
+| ✍️ **`writing-skills`** | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
 
-### Usage
+## 💡 Usage
 
-Once installed, these agents and skills become available to Junie during the development process. You can refer to individual `SKILL.md` files for specific usage instructions of each skill.
+Once installed, these agents and skills become automatically available to coding agents like Junie during the development process. 
+
+📚 **Tip:** Refer to individual `SKILL.md` files within the `skills/` directory for specific usage instructions and best practices for each skill.
+
+---
+<div align="center">
+  <i>Empowering autonomous development with AI coding agents.</i>
+</div>
