@@ -40,6 +40,8 @@ Execute the implementation plan systematically. If using subagents, dispatch the
 ### 5. Push and Create Merge Request
 Once implementation is complete, tests pass, and your branch is updated, push and open a Merge Request.
 **The MR description MUST be in Markdown format.**
+- **The feature branch must ALWAYS be pushed to the remote with the `--set-upstream` (or `-u`) setting.**
+- **The MR description MUST ALWAYS contain "Closes #ISSUE" if the MR references an issue.**
 
 ```bash
 git push -u origin feat/[feature-name]
@@ -55,7 +57,8 @@ Closes #[Issue Number]
 | Mistake | Fix |
 |---------|-----|
 | Branching from an outdated `main` branch | Always run `git checkout main && git pull` before creating a new feature branch. |
-| Forgetting to link the issue in the MR | Append `Closes #<Issue Number>` to the end of the MR description. |
+| Forgetting to link the issue in the MR | Append `Closes #<Issue Number>` to the MR description. **This is MANDATORY if the MR references an issue.** |
+| Pushing without `--set-upstream` | Always use `git push -u origin <branch>` to set up remote tracking. |
 | Pushing without running tests | Ensure all changes compile and pass tests before pushing. |
 | Creating an MR with conflicts | Rebase or merge `main` into your feature branch before creating the MR. |
 | Leaving merged branches in local | Run `git branch -d <branch>` after the MR is merged. |
@@ -65,5 +68,7 @@ Closes #[Issue Number]
 - Creating a feature branch without pulling `main` first.
 - Implementing a complex plan without decomposing it into test-driven steps.
 - Creating an MR without a descriptive summary or issue link.
+- **Pushing a feature branch WITHOUT the `--set-upstream` (or `-u`) setting.**
+- **Creating an MR for an issue WITHOUT the `Closes #ISSUE` string in the description.**
 - **Creating an MR with a description that is not in Markdown format.**
 - Ignoring CI/CD pipeline failures after pushing.
