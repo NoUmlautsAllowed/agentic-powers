@@ -8,6 +8,8 @@
 `agentic-powers` provides modular capabilities, specialized subagents, and domain-specific guidance to significantly enhance your AI-assisted development workflow with coding agents like Claude or Junie.
 
 > 🙌 **Huge Shoutout:** A massive thanks to the amazing [obra/superpowers](https://github.com/obra/superpowers) repository! The subagents and skills in this project are heavily inspired by and adapted from their fantastic work.
+>
+> 🦴 **Caveman Skill Source:** The `caveman` skill is sourced from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman).
 
 ## 📁 Project Structure
 
@@ -44,6 +46,7 @@ Each skill is located in its own directory within `skills/` and includes a `SKIL
 | Skill | Description |
 |-------|-------------|
 | 🎫 **`atlassian-cli`** | Work seamlessly with Atlassian products (Jira, Confluence) from the command line using the `acli` tool. |
+| 🦴 **`caveman`** | Ultra-compressed communication mode. Cuts token usage ~75% by speaking like caveman. |
 | 🧠 **`brainstorming`** | You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation. |
 | 📝 **`git-commit`** | Use when creating git commit messages to ensure they follow project standards and best practices. |
 | 🦊 **`gitlab-workflow`** | Use when starting a new feature implementation, executing an implementation plan, or managing a GitLab issue and merge request lifecycle |
