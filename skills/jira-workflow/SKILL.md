@@ -6,7 +6,7 @@ description: Use when implementing features or bugfixes tracked in Jira, before 
 # Jira Development Workflow
 
 ## Overview
-This skill defines the standard workflow for developing new features using Jira for issue tracking and GitLab for source control. It ensures that all work is tied to an existing Jira ticket and that the development process is documented directly within Jira and GitLab.
+This skill defines the standard workflow for developing new features using Jira for issue tracking and GitLab for source control. It ensures that all work is tied to an existing Jira ticket and that the development process is documented.
 
 ## When to Use
 - You have been assigned a Jira ticket (e.g., `ISSUE-XXXX`).
@@ -22,8 +22,7 @@ This skill defines the standard workflow for developing new features using Jira 
 ### 0. Atlassian CLI Access
 This skill requires the **Atlassian CLI `acli`** to be available. 
 - All Jira operations must be performed using the `acli` command.
-- Ensure you are authenticated with `acli auth login` if not already.
-- You can check your authentication status with `acli auth status`.
+- Ensure you are authenticated with `acli auth status`.
 
 ### 1. Identify Existing Jira Ticket
 You MUST be provided with an existing Jira Ticket ID (e.g., `ISSUE-XXXX`).
@@ -31,12 +30,8 @@ You MUST be provided with an existing Jira Ticket ID (e.g., `ISSUE-XXXX`).
 
 ### 2. Update Workspace
 Always ensure your local repository is up to date before branching.
-The default branch of the repository can have the name `master` or `main`. You can use the following command to figure out the default branch of the repository:
 ```bash
 git rev-parse --abbrev-ref origin/HEAD
-```
-Then checkout the default branch (e.g., `main` or `master`) and pull the latest changes:
-```bash
 git checkout <DEFAULT_BRANCH>
 git pull
 ```
@@ -47,11 +42,7 @@ Analyze the Jira ticket content using `acli jira workitem view ISSUE-XXXX` and c
 
 ### 4. Submit Plan as Jira Comment
 Submit your implementation plan as a comment to the existing Jira ticket using `acli`. 
-If the implementation plan is written to a file, you can use the `--body-file` option.
-
 ```bash
-acli jira workitem comment create --key ISSUE-XXXX --body "Implementation Plan\n\n1. Task A...\n2. Task B..."
-# Or using a file:
 acli jira workitem comment create --key ISSUE-XXXX --body-file plan.txt
 ```
 
@@ -67,29 +58,26 @@ Execute the implementation plan following Test-Driven Development (TDD).
 ### 7. Push and Create Merge Request
 When implementation is complete and tests pass, push the branch and open a Merge Request.
 **The MR description MUST be in Markdown format.**
-
-**MR Title Template:** `<JIRA TICKET ID>: [feature name]`
-**MR Description Template:** 
+- **The MR Title Template:** `<JIRA TICKET ID>: [feature name]`
+- **The MR Description Template:**
 ```markdown
 ### Summary of changes
 - [Brief list of changes]
 
 Closes <JIRA TICKET ID>
 ```
-**Note: GitLab fully supports Markdown for MR descriptions.**
+- **The Merge Request MUST ALWAYS be created with the `--remove-source-branch` flag.**
 
 ```bash
 git push -u origin ISSUE-XXXX
 glab mr create --title "ISSUE-XXXX: [feature name]" --description "### Summary of changes
 - [Brief list of changes]
 
-Closes ISSUE-XXXX"
+Closes ISSUE-XXXX" --remove-source-branch
 ```
 
 ### 9. Add MR Link as Jira Comment
 After creating the GitLab MR, add a link to the MR as a comment to the Jira Issue.
-You can get the MR link from the output of the `glab mr create` command. 
-
 ```bash
 acli jira workitem comment create --key ISSUE-XXXX --body "GitLab Merge Request: [MR URL]"
 ```
@@ -104,13 +92,21 @@ acli jira workitem comment create --key ISSUE-XXXX --body "GitLab Merge Request:
 | Missing MR link in Jira | Ensure the GitLab MR link is added as a comment to the Jira Issue. |
 | Incorrect MR title | Follow the `<JIRA TICKET ID>: [feature name]` format exactly. |
 | Non-Markdown MR description | Always use Markdown (headers, bullets) for MR descriptions. |
-| Incorrect MR description | Ensure it starts with a summary and ends with `Closes <JIRA TICKET ID>`. |
-| Forgetting to pull main | Always run `git checkout main && git pull` before branching. |
+| Leaving merged branches in remote | **ALWAYS use `--remove-source-branch` when creating the MR.** |
+
+## Rationalization Table
+
+| Excuse | Reality |
+|--------|---------|
+| "The user can see the MR in GitLab" | Jira is the source of truth for project management. Comments ensure traceability. |
+| "I'll clean up the branch later" | Manual cleanup is unreliable. Use the automated flag. |
+| "The plan is too long for a comment" | Use `--body-file` to upload the full plan. |
 
 ## Red Flags - STOP and Correct
 - **Failing to use Atlassian CLI `acli` for Jira operations.**
 - **Creating any ticket or issue (Jira or GitLab).**
 - Submitting an MR without the mandatory title prefix.
+- **Creating an MR without the `--remove-source-branch` flag.**
 - **Creating an MR with a description that is not in Markdown format.**
 - Forgetting to add the MR link as a Jira comment.
 - Putting the implementation plan in a GitLab issue instead of a Jira comment.
