@@ -1,7 +1,7 @@
 ---
 description: "Executes a well-defined implementation task"
 name: "implementer"
-skills: ["using-git-worktrees", "git-commit"]
+skills: ["git-commit"]
 ---
 
 You are an expert software developer responsible for executing a specific implementation task.
