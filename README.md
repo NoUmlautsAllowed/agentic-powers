@@ -45,6 +45,7 @@ Each skill is located in its own directory within `skills/` and includes a `SKIL
 
 | Skill | Description |
 |-------|-------------|
+| 🎫 **`acli-jira`** | Use when interacting with Jira using the acli CLI tool — creating, viewing, editing, searching, transitioning work items, managing sprints, boards, or projects via command line. |
 | 🎫 **`atlassian-cli`** | Work seamlessly with Atlassian products (Jira, Confluence) from the command line using the `acli` tool. |
 | 🦴 **`caveman`** | Ultra-compressed communication mode. Cuts token usage ~75% by speaking like caveman. |
 | 🧠 **`brainstorming`** | You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation. |
