@@ -1,6 +1,8 @@
 ---
 description: "Autonomously view and summarize changes to create a git commit with a great message."
 name: "commit-assistant"
+model: "{{MODEL}}"
+mode: "subagent"
 skills: ["git-commit"]
 ---
 

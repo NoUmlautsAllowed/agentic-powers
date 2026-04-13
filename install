@@ -1,32 +1,106 @@
 #!/bin/bash
+set -euo pipefail
 
-# Default target directory
-TARGET_DIR="${1:-$HOME/.junie}"
+# 1. Argument Parsing
+PROVIDER=${1:-}
+if [[ -z "$PROVIDER" ]] || [[ "$PROVIDER" != "junie" && "$PROVIDER" != "opencode" && "$PROVIDER" != "claude" ]]; then
+    echo "Usage: ./install [junie|opencode|claude]"
+    exit 1
+fi
 
-# Ensure target directory exists
-mkdir -p "$TARGET_DIR"
+# 2. Environment Sourcing
+# Source defaults
+if [ -f .env.defaults ]; then
+    set -a
+    source .env.defaults
+    set +a
+fi
 
-# Get the absolute path of the current directory (repository root)
-REPO_ROOT=$(pwd)
+# Source user overrides if exists
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
 
-# Function to create symlink
-create_symlink() {
-    local source_dir="$1"
-    local target_dir="$2"
-    local dir_name=$(basename "$source_dir")
-    local link_path="$target_dir/$dir_name"
-
-    # Remove existing file, directory or symlink if it exists
-    if [ -e "$link_path" ] || [ -L "$link_path" ]; then
-        rm -rf "$link_path"
+# Apply provider-specific overrides if MODEL is not already set by .env
+if [ -z "${MODEL:-}" ]; then
+    if [ "$PROVIDER" == "opencode" ]; then
+        export MODEL="ollama/gemma4:26b"
+    elif [ "$PROVIDER" == "junie" ]; then
+        export MODEL="inherit"
     fi
+fi
 
-    ln -s "$source_dir" "$link_path"
-    echo "Symlinked $source_dir to $link_path"
-}
+# 3. Directory Management
+INSTALL_DIR=".install/$PROVIDER"
+mkdir -p "$INSTALL_DIR/agents" "$INSTALL_DIR/skills"
 
-# Symlink agents and skills
-create_symlink "$REPO_ROOT/agents" "$TARGET_DIR"
-create_symlink "$REPO_ROOT/skills" "$TARGET_DIR"
+# Copy source files - remove suppressed errors
+cp -r agents/* "$INSTALL_DIR/agents/"
+cp -r skills/* "$INSTALL_DIR/skills/"
 
-echo "Installation complete. Directories linked to $TARGET_DIR"
+# 4. Template Replacement
+echo "Applying template replacements..."
+
+# Instead of building a giant sed script with environment variables (which contains many 
+# characters that break sed), we only replace the variables we actually NEED. 
+# In this project, the only template variable used is {{MODEL}}.
+# If more are added in the future, they can be added to this list.
+
+# Get the current value of MODEL
+CURRENT_MODEL="${MODEL:-}"
+
+if [[ -n "$CURRENT_MODEL" ]]; then
+    # Use a safe delimiter for sed. Since MODEL might contain '/', we use '|'.
+    # We escape '|' in the value just in case.
+    # IMPORTANT: Use double quotes for the sed command to allow variable expansion,
+    # but ensure the replacement part is handled correctly.
+    # We use a simple replacement that doesn't use the sed -i -f method.
+    
+    # We use a temporary file for the value to avoid any shell expansion issues if needed,
+    # but for a simple string, this should work.
+    # The issue was likely the '\"' in the template.
+    
+    find "$INSTALL_DIR" -type f -exec sed -i "s|{{MODEL}}|$CURRENT_MODEL|g" {} +
+fi
+
+
+
+# 5. Symlinking
+TARGET_DIR="$HOME/.$PROVIDER"
+
+if [[ "$PROVIDER" == "opencode" ]]; then
+    TARGET_DIR="$HOME/.config/opencode"
+fi
+
+mkdir -p "$(dirname "$TARGET_DIR")"
+
+# Only delete $TARGET_DIR if it is already a symlink or an empty directory
+if [ -L "$TARGET_DIR/skills" ]; then
+    echo "Removing existing symlink $TARGET_DIR/skills"
+    rm "$TARGET_DIR/skills"
+else
+    echo "Error: $TARGET_DIR/skills exists and is not empty. Please move it before installing."
+    exit 1
+fi
+
+if [ -L "$TARGET_DIR/agents" ]; then
+    echo "Removing existing symlink $TARGET_DIR/agents"
+    rm "$TARGET_DIR/agents"
+else
+    echo "Error: $TARGET_DIR/agents exists and is not empty. Please move it before installing."
+    exit 1
+fi
+
+
+
+# Create absolute path for source
+ABS_INSTALL_DIR="$(pwd)/$INSTALL_DIR"
+
+# Create the symlink
+ln -svf "$ABS_INSTALL_DIR/skills" "$TARGET_DIR/skills"
+ln -svf "$ABS_INSTALL_DIR/agents" "$TARGET_DIR/agents"
+
+echo "Successfully installed $PROVIDER to $TARGET_DIR"
+echo "Configuration applied to $ABS_INSTALL_DIR"

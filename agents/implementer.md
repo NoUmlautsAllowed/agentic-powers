@@ -1,6 +1,8 @@
 ---
 description: "Executes a well-defined implementation task"
 name: "implementer"
+mode: "subagent"
+model: "{{MODEL}}"
 skills: ["git-commit"]
 ---
 

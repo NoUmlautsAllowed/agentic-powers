@@ -2,3 +2,7 @@
 .idea
 .worktrees/
 .DS_Store
+docs/superpowers
+.env
+.install/
+
