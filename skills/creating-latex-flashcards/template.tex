@@ -1,0 +1,49 @@
+% Flashcards template — preamble is fixed; replace placeholders and add cards.
+\documentclass[avery5388,grid,frame]{flashcards}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{comment}
+\usepackage{amsmath}
+
+\cardfrontstyle[\large\slshape]{headings}
+\cardbackstyle{empty}
+
+\begin{document}
+ \cardfrontfoot{<DECK TITLE>}
+
+ % --- Style A: simple list ---------------------------------------------------
+ \begin{flashcard}[<CATEGORY>]{<TERM>}
+  \medskip
+  \textbf{<LEAD-IN>:}
+  \begin{itemize}
+   \item <ITEM 1>
+   \item <ITEM 2>
+   \item <ITEM 3>
+  \end{itemize}
+ \end{flashcard}
+
+ % --- Style B: centered prose, vertically filled -----------------------------
+ \begin{flashcard}[<CATEGORY>]{<TERM>}\centering\vspace{\fill}
+  <DEFINITION OR EXPLANATION>
+  \vspace{\fill}
+ \end{flashcard}
+
+ % --- Style C: short statement + bullet list ---------------------------------
+ \begin{flashcard}[<CATEGORY>]{<TERM>}\vspace{\fill}
+  \begin{center}
+    <SHORT STATEMENT OR DEFINITION>
+  \end{center}
+  \vspace{1em}
+  \textbf{<LEAD-IN>:}
+  \begin{itemize}
+   \item <ITEM 1>
+   \item <ITEM 2>
+   \item <ITEM 3>
+  \end{itemize}
+  \vspace{\fill}
+ \end{flashcard}
+
+\end{document}
