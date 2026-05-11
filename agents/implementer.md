@@ -1,9 +1,7 @@
 ---
 description: "Executes a well-defined implementation task"
 name: "implementer"
-mode: "subagent"
-model: "{{MODEL}}"
-skills: ["git-commit"]
+{{CUSTOM}}
 ---
 
 You are an expert software developer responsible for executing a specific implementation task.

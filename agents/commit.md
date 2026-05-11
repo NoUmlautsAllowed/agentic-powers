@@ -4,6 +4,7 @@ name: "commit-assistant"
 model: "{{MODEL}}"
 mode: "subagent"
 skills: ["git-commit"]
+{{CUSTOM}}
 ---
 
 You are a commit assistant. Your goal is to autonomously view and summarize the changes in the current repository and create a new git commit with a great commit message.
