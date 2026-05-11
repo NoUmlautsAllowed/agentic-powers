@@ -9,21 +9,19 @@ if [[ -z "$PROVIDER" ]] || [[ "$PROVIDER" != "junie" && "$PROVIDER" != "opencode
 fi
 
 # 2. Environment Sourcing
-# Source defaults
 if [ -f .env.defaults ]; then
     set -a
     source .env.defaults
     set +a
 fi
 
-# Source user overrides if exists
 if [ -f .env ]; then
     set -a
     source .env
     set +a
 fi
 
-# Apply provider-specific overrides if MODEL is not already set by .env
+# Apply provider-specific overrides
 if [ -z "${MODEL:-}" ]; then
     if [ "$PROVIDER" == "opencode" ]; then
         export MODEL="ollama/gemma4:26b"
@@ -32,73 +30,59 @@ if [ -z "${MODEL:-}" ]; then
     fi
 fi
 
-# 3. Directory Management
-INSTALL_DIR=".install/$PROVIDER"
-mkdir -p "$INSTALL_DIR/agents" "$INSTALL_DIR/skills"
+# 3. Rendering Settings
+# Determine which CUSTOM block to use
+CUSTOM_VAR="${PROVIDER^^}_CUSTOM"
+CUSTOM_VAL="${!CUSTOM_VAR:-}"
 
-# Copy source files - remove suppressed errors
-cp -r agents/* "$INSTALL_DIR/agents/"
-cp -r skills/* "$INSTALL_DIR/skills/"
-
-# 4. Template Replacement
-echo "Applying template replacements..."
-
-# Instead of building a giant sed script with environment variables (which contains many 
-# characters that break sed), we only replace the variables we actually NEED. 
-# In this project, the only template variable used is {{MODEL}}.
-# If more are added in the future, they can be added to this list.
-
-# Get the current value of MODEL
-CURRENT_MODEL="${MODEL:-}"
-
-if [[ -n "$CURRENT_MODEL" ]]; then
-    # Use a safe delimiter for sed. Since MODEL might contain '/', we use '|'.
-    # We escape '|' in the value just in case.
-    # IMPORTANT: Use double quotes for the sed command to allow variable expansion,
-    # but ensure the replacement part is handled correctly.
-    # We use a simple replacement that doesn't use the sed -i -f method.
-    
-    # We use a temporary file for the value to avoid any shell expansion issues if needed,
-    # but for a simple string, this should work.
-    # The issue was likely the '\"' in the template.
-    
-    find "$INSTALL_DIR" -type f -exec sed -i "s|{{MODEL}}|$CURRENT_MODEL|g" {} +
-fi
-
-
-
-# 5. Symlinking
+# 4. Directory Management
 TARGET_DIR="$HOME/.$PROVIDER"
-
 if [[ "$PROVIDER" == "opencode" ]]; then
     TARGET_DIR="$HOME/.config/opencode"
 fi
 
+# Setup install directories
+INSTALL_DIR=".install/$PROVIDER"
+mkdir -p "$INSTALL_DIR/agents" "$INSTALL_DIR/skills"
+
+# Copy all files to INSTALL_DIR
+cp -r agents/. "$INSTALL_DIR/agents/"
+cp -r skills/. "$INSTALL_DIR/skills/"
+
+echo "Applying multi-stage rendering inline..."
+
+# Perform template variable replacement inline on .md files
+find "$INSTALL_DIR/agents" "$INSTALL_DIR/skills" -type f -name "*.md" | while read -r file; do
+    # Pipeline:
+    # 1. Base replacements (MODEL, MODE)
+    # 2. CUSTOM injection
+    # 3. Variable expansion within the result (Second Rendering)
+    sed -i \
+        -e "s|{{MODEL}}|$MODEL|g" \
+        -e "s|{{MODE}}|$MODE|g" \
+        -e "s|{{CUSTOM}}|$CUSTOM_VAL|g" \
+        -e "s|{{MODEL}}|$MODEL|g" \
+        -e "s|{{MODE}}|$MODE|g" \
+        "$file"
+done
+
+# 5. Symlinking
 mkdir -p "$(dirname "$TARGET_DIR")"
 
-# Only delete $TARGET_DIR if it is already a symlink or an empty directory
+# Only delete $TARGET_DIR/skills if it is a symlink
 if [ -L "$TARGET_DIR/skills" ]; then
-    echo "Removing existing symlink $TARGET_DIR/skills"
     rm "$TARGET_DIR/skills"
-else
-    echo "Error: $TARGET_DIR/skills exists and is not empty. Please move it before installing."
-    exit 1
+elif [ -d "$TARGET_DIR/skills" ] && [ -z "$(ls -A "$TARGET_DIR/skills")" ]; then
+    rmdir "$TARGET_DIR/skills"
 fi
 
 if [ -L "$TARGET_DIR/agents" ]; then
-    echo "Removing existing symlink $TARGET_DIR/agents"
     rm "$TARGET_DIR/agents"
-else
-    echo "Error: $TARGET_DIR/agents exists and is not empty. Please move it before installing."
-    exit 1
+elif [ -d "$TARGET_DIR/agents" ] && [ -z "$(ls -A "$TARGET_DIR/agents")" ]; then
+    rmdir "$TARGET_DIR/agents"
 fi
 
-
-
-# Create absolute path for source
 ABS_INSTALL_DIR="$(pwd)/$INSTALL_DIR"
-
-# Create the symlink
 ln -svf "$ABS_INSTALL_DIR/skills" "$TARGET_DIR/skills"
 ln -svf "$ABS_INSTALL_DIR/agents" "$TARGET_DIR/agents"
 
