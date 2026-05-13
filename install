@@ -32,7 +32,8 @@ fi
 
 # 3. Rendering Settings
 # Determine which CUSTOM block to use
-CUSTOM_VAR="${PROVIDER^^}_CUSTOM"
+PROVIDER_UPPER=$(printf '%s' "$PROVIDER" | tr '[:lower:]' '[:upper:]') 
+CUSTOM_VAR="${PROVIDER_UPPER}_CUSTOM"
 CUSTOM_VAL="${!CUSTOM_VAR:-}"
 
 # 4. Directory Management
@@ -57,13 +58,21 @@ find "$INSTALL_DIR/agents" "$INSTALL_DIR/skills" -type f -name "*.md" | while re
     # 1. Base replacements (MODEL, MODE)
     # 2. CUSTOM injection
     # 3. Variable expansion within the result (Second Rendering)
-    sed -i \
+    if sed --version >/dev/null 2>&1; then
+      # GNU sed
+      sed -i \
         -e "s|{{MODEL}}|$MODEL|g" \
         -e "s|{{MODE}}|$MODE|g" \
         -e "s|{{CUSTOM}}|$CUSTOM_VAL|g" \
+        "$file"
+    else
+      # BSD (macOS) sed
+      sed -i '' \
         -e "s|{{MODEL}}|$MODEL|g" \
         -e "s|{{MODE}}|$MODE|g" \
+        -e "s|{{CUSTOM}}|$CUSTOM_VAL|g" \
         "$file"
+    fi
 done
 
 # 5. Symlinking
